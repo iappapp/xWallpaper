@@ -1,0 +1,43 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode user data
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+
+# Xcode build artifacts
+DerivedData/
+build/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+
+# Swift Package Manager
+.swiftpm/
+.build/
+Package.resolved
+
+# CocoaPods / Carthage (if added later)
+Pods/
+Carthage/Build/
+
+# Fastlane artifacts (if used)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# Editor / tooling
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Archives / logs
+*.log
+*.tmp
+*.zip
