@@ -5,7 +5,17 @@ struct CategoryView: View {
     @AppStorage("selectedCategoryIds") private var selectedCategoryIdsString: String = ""
     let onSelectChange: (Set<String>) -> Void
 
-    private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 3)
+    private var columns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
+    }
+
+    private var gridSpacing: CGFloat {
+        10
+    }
+
+    private var horizontalPadding: CGFloat {
+        10
+    }
 
     private var selectedCategoryIds: Set<String> {
         Set(selectedCategoryIdsString.split(separator: ",").map(String.init))
@@ -18,12 +28,12 @@ struct CategoryView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
-            LazyVGrid(columns: columns, spacing: 8) {
+            LazyVGrid(columns: columns, spacing: gridSpacing) {
                 ForEach(categories) { cat in
                     categoryCard(cat)
                 }
             }
-            .padding(.horizontal, 10)
+            .padding(.horizontal, horizontalPadding)
             .padding(.vertical, 8)
         }
         .frame(maxHeight: .infinity)
@@ -65,13 +75,14 @@ struct CategoryView: View {
                 .padding(.leading, 8)
                 .padding(.bottom, 8)
         }
-        .frame(height: 80)
-        .clipped()  // 添加 clipped 以确保内容不会溢出边界
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 80, maxHeight: 80)
         .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+        .clipped()
         .overlay(
             RoundedRectangle(cornerRadius: 5, style: .continuous)
                 .stroke(isSelected ? Color.white.opacity(0.95) : Color.clear, lineWidth: 1.2)
         )
+        .padding(.horizontal, 4)
         .contentShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
         .onTapGesture {
             var newIds = selectedCategoryIds
@@ -96,7 +107,8 @@ private struct CategoryThumbnailImageView: View {
             if let localImage {
                 Image(nsImage: localImage)
                     .resizable()
-                    .aspectRatio(contentMode: .fill)
+                    .scaledToFill()
+                    .clipped()
             } else if isLoading {
                 ProgressView()
                     .tint(.white)
@@ -104,6 +116,7 @@ private struct CategoryThumbnailImageView: View {
                 Color.gray.opacity(0.3)
             }
         }
+        .frame(minWidth: 110, maxWidth: 120, minHeight: 80, maxHeight: 80)
         .task(id: category.id) {
             isLoading = true
             if let cached = CategoryThumbCache.shared.cachedThumbnailURL(for: category) {
