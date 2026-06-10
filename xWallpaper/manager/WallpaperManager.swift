@@ -103,50 +103,104 @@ class WallpaperManager {
                 return
             }
 
-            let fileManager = FileManager.default
-            let wallpaperDirectory = self.resolveAuthorizedWallpaperDirectory() ?? self.defaultWallpaperDirectoryURL()
-            let sanitizedID = wallpaper.id.replacingOccurrences(of: "/", with: "_")
-            let fileName = sanitizedID.isEmpty ? UUID().uuidString : sanitizedID
-            let destination = wallpaperDirectory.appendingPathComponent(fileName + ".jpg")
-            let accessStarted = wallpaperDirectory.startAccessingSecurityScopedResource()
-
-            defer {
-                if accessStarted {
-                    wallpaperDirectory.stopAccessingSecurityScopedResource()
+            self.saveWallpaperData(data, wallpaper: wallpaper) { result in
+                switch result {
+                case .success(let destination):
+                    DispatchQueue.main.async {
+                        self.applyWallpaper(at: destination, completion: completion)
+                    }
+                case .failure(let error):
+                    DispatchQueue.main.async {
+                        completion(.failure(error))
+                    }
                 }
             }
+        }.resume()
+    }
 
-            do {
-                try fileManager.createDirectory(at: wallpaperDirectory, withIntermediateDirectories: true)
-                try data.write(to: destination, options: .atomic)
-                print("[WallpaperManager] ✅ Wallpaper saved successfully")
-                print("    Directory: \(wallpaperDirectory.path)")
-                print("    File: \(destination.lastPathComponent)")
-                print("    Size: \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file))")
-            } catch {
-                let nsError = error as NSError
-                print("[WallpaperManager] ❌ Write failed")
-                print("    Directory: \(wallpaperDirectory.path)")
-                print("    File: \(destination.path)")
+    func downloadWallpaper(_ wallpaper: Wallpaper, completion: @escaping (Result<URL, WallpaperError>) -> Void) {
+        guard let url = URL(string: wallpaper.url) else {
+            DispatchQueue.main.async {
+                completion(.failure(.invalidResponse))
+            }
+            return
+        }
+
+        urlSession.dataTask(with: url) { data, response, error in
+            if let error {
                 DispatchQueue.main.async {
-                    completion(.failure(.writeFailed))
+                    completion(.failure(.network(error)))
                 }
                 return
             }
 
-            DispatchQueue.main.async {
-                guard let screen = NSScreen.main else {
-                    completion(.failure(.noMainScreen))
-                    return
+            guard
+                let httpResponse = response as? HTTPURLResponse,
+                (200...299).contains(httpResponse.statusCode),
+                let data
+            else {
+                DispatchQueue.main.async {
+                    completion(.failure(.invalidResponse))
                 }
+                return
+            }
 
-                do {
-                    try NSWorkspace.shared.setDesktopImageURL(destination, for: screen, options: [:])
-                    completion(.success(()))
-                } catch {
-                    completion(.failure(.applyFailed(error)))
+            guard NSImage(data: data) != nil else {
+                DispatchQueue.main.async {
+                    completion(.failure(.invalidImageData))
+                }
+                return
+            }
+
+            self.saveWallpaperData(data, wallpaper: wallpaper) { result in
+                DispatchQueue.main.async {
+                    completion(result)
                 }
             }
         }.resume()
+    }
+
+    private func saveWallpaperData(_ data: Data, wallpaper: Wallpaper, completion: @escaping (Result<URL, WallpaperError>) -> Void) {
+        let fileManager = FileManager.default
+        let wallpaperDirectory = self.resolveAuthorizedWallpaperDirectory() ?? self.defaultWallpaperDirectoryURL()
+        let sanitizedID = wallpaper.id.replacingOccurrences(of: "/", with: "_")
+        let fileName = sanitizedID.isEmpty ? UUID().uuidString : sanitizedID
+        let destination = wallpaperDirectory.appendingPathComponent(fileName + ".jpg")
+        let accessStarted = wallpaperDirectory.startAccessingSecurityScopedResource()
+
+        defer {
+            if accessStarted {
+                wallpaperDirectory.stopAccessingSecurityScopedResource()
+            }
+        }
+
+        do {
+            try fileManager.createDirectory(at: wallpaperDirectory, withIntermediateDirectories: true)
+            try data.write(to: destination, options: .atomic)
+            print("[WallpaperManager] ✅ Wallpaper saved successfully")
+            print("    Directory: \(wallpaperDirectory.path)")
+            print("    File: \(destination.lastPathComponent)")
+            print("    Size: \(ByteCountFormatter.string(fromByteCount: Int64(data.count), countStyle: .file))")
+            completion(.success(destination))
+        } catch {
+            print("[WallpaperManager] ❌ Write failed")
+            print("    Directory: \(wallpaperDirectory.path)")
+            print("    File: \(destination.path)")
+            completion(.failure(.writeFailed))
+        }
+    }
+
+    private func applyWallpaper(at destination: URL, completion: @escaping (Result<Void, WallpaperError>) -> Void) {
+        guard let screen = NSScreen.main else {
+            completion(.failure(.noMainScreen))
+            return
+        }
+
+        do {
+            try NSWorkspace.shared.setDesktopImageURL(destination, for: screen, options: [:])
+            completion(.success(()))
+        } catch {
+            completion(.failure(.applyFailed(error)))
+        }
     }
 }

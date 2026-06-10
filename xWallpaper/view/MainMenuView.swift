@@ -29,6 +29,7 @@ struct MainMenuView: View {
     @AppStorage("selectedCategoryIds") private var selectedCategoryIdsString: String = "nature"
     @State private var isShuffling = false
     @State private var isApplyingWallpaper = false
+    @State private var isDownloadingWallpaper = false
     @State private var randomWallpaperCached: Wallpaper?
     @State private var hasInitializedRandomWallpaper = false
 
@@ -87,8 +88,10 @@ struct MainMenuView: View {
                         wallpaper: randomWallpaperCached,
                         canSetWallpaper: randomWallpaperCached != nil && !isApplyingWallpaper,
                         isShuffling: isShuffling,
+                        isDownloadingWallpaper: isDownloadingWallpaper,
                         onShuffle: handleShuffleTap,
-                        onApplyWallpaper: applyRandomWallpaper
+                        onApplyWallpaper: applyRandomWallpaper,
+                        onDownload: downloadRandomWallpaper
                     )
                 }
             }
@@ -180,6 +183,22 @@ struct MainMenuView: View {
                 addHistory(wallpaper)
             case .failure(let error):
                 print("Failed to set wallpaper: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func downloadRandomWallpaper(_ wallpaper: Wallpaper) {
+        guard !isDownloadingWallpaper else { return }
+        isDownloadingWallpaper = true
+
+        WallpaperManager.shared.downloadWallpaper(wallpaper) { result in
+            isDownloadingWallpaper = false
+
+            switch result {
+            case .success(let fileURL):
+                print("Downloaded wallpaper to: \(fileURL.path)")
+            case .failure(let error):
+                print("Failed to download wallpaper: \(error.localizedDescription)")
             }
         }
     }

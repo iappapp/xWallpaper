@@ -70,13 +70,8 @@ struct SettingsView: View {
             .font(.system(size: 18, weight: .medium))
             .padding(.top, 10)
 
-            Spacer(minLength: 10)
+            Spacer(minLength: 2)
 
-            HStack(spacing: 12) {
-                Text("Send us feedback")
-                Text("•")
-                Text("Visit unsplash.com")
-            }
 
             HStack {
                 Text("v2025.02.1 (54)")

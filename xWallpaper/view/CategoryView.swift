@@ -66,6 +66,7 @@ struct CategoryView: View {
                 .padding(.bottom, 8)
         }
         .frame(height: 80)
+        .clipped()  // 添加 clipped 以确保内容不会溢出边界
         .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 5, style: .continuous)

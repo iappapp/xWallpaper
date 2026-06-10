@@ -6,7 +6,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let popover = NSPopover()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        popover.contentSize = NSSize(width: 380, height: 420)
+        popover.contentSize = NSSize(width: 380, height: 460)
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(rootView: MainMenuView())
 

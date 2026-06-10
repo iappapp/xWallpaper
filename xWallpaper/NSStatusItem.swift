@@ -5,7 +5,7 @@ import SwiftUI
 extension Scene {
     func setupMenuBar() -> some Scene {
         let popover = NSPopover()
-        popover.contentSize = NSSize(width: 380, height: 460)
+        popover.contentSize = NSSize(width: 380, height: 500)
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(rootView: MainMenuView())
         
