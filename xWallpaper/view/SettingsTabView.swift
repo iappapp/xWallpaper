@@ -7,9 +7,7 @@ struct SettingsTabView: View {
     }
 }
 
-struct SettingsTabView_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingsTabView()
-            .frame(width: 380, height: 320)
-    }
+#Preview("Settings Tab") {
+    SettingsTabView()
+        .frame(width: 380, height: 320)
 }

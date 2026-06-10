@@ -137,9 +137,7 @@ struct SettingsView: View {
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingsView()
-            .frame(width: 380, height: 320)
-    }
+#Preview("Settings") {
+    SettingsView()
+        .frame(width: 380, height: 320)
 }

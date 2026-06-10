@@ -138,9 +138,6 @@ private struct CategoryThumbnailImageView: View {
 }
 
 #Preview("Category Grid") {
-    CategoryView(
-        categories: PreviewData.categories,
-        onSelectChange: { _ in }
-    )
-    .frame(width: 380, height: 320)
+    CategoryPreviewHost()
+        .frame(width: 380, height: 320)
 }

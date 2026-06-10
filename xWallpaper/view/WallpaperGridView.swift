@@ -17,7 +17,7 @@ struct WallpaperGridView: View {
     }
 
     private var tileHeight: CGFloat {
-        62
+        70
     }
 
     private var horizontalPadding: CGFloat {
@@ -108,7 +108,7 @@ private struct WallpaperThumbnailImageView: View {
 
 #Preview("Wallpaper Grid") {
     WallpaperSelectionPreviewHost(wallpapers: PreviewData.wallpapers)
-        .frame(width: 380, height: 220)
+        .frame(width: 380, height: 380)
 }
 
 #Preview("Wallpaper Grid - Empty") {
@@ -117,5 +117,5 @@ private struct WallpaperThumbnailImageView: View {
         fillsAvailableHeight: true,
         showsPlaceholdersWhenEmpty: true
     )
-    .frame(width: 380, height: 220)
+    .frame(width: 380, height: 380)
 }

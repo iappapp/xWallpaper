@@ -107,3 +107,14 @@ struct HeaderPreviewHost: View {
         HeaderBarView(currentPage: $currentPage, headerHeight: 50)
     }
 }
+
+struct CategoryPreviewHost: View {
+    @State private var selectedCategoryIds: Set<String> = ["nature"]
+
+    var body: some View {
+        CategoryView(
+            categories: PreviewData.categories,
+            onSelectChange: { _ in }
+        )
+    }
+}
