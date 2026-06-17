@@ -49,7 +49,7 @@ struct WallpaperGridView: View {
         let shape = RoundedRectangle(cornerRadius: 5, style: .continuous)
 
         WallpaperThumbnailImageView(wallpaper: wallpaper, shape: shape)
-        .frame(height: tileHeight)
+            .frame(width: 110, height: tileHeight)
         .clipShape(shape)
         .overlay(shape.stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 1.5))
         .shadow(color: isSelected ? Color.black.opacity(0.12) : Color.clear, radius: 3, x: 0, y: 1)
