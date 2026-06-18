@@ -19,13 +19,13 @@ enum MainMenuPage: String, CaseIterable {
 struct MainMenuView: View {
     private let panelWidth: CGFloat = 380
     private let panelHeight: CGFloat = 360
-    private let headerHeight: CGFloat = 50
+    private let headerHeight: CGFloat = 40
 
     @State private var selectedWallpaper: Wallpaper?
     @State private var wallpapers: [Wallpaper] = []
     @State private var historyWallpapers: [Wallpaper] = []
     @State private var categories: [Category] = []
-    @AppStorage("mainMenu.currentPage") private var currentPageRawValue: String = MainMenuPage.random.rawValue
+    @AppStorage("mainMenu.currentPage") private var currentPageRawValue: String = MainMenuPage.settings.rawValue
     @AppStorage("selectedCategoryIds") private var selectedCategoryIdsString: String = "nature"
     @State private var isShuffling = false
     @State private var isApplyingWallpaper = false

@@ -73,12 +73,10 @@ struct RandomTabView: View {
                         .disabled(!canSetWallpaper || wallpaper == nil)
                         
                     }
-                    .padding(.horizontal, 20)    
                 }
-                .padding(.horizontal, 20)
             }
             .frame(maxWidth: .infinity, minHeight:20)
-            .padding(.horizontal, 10)
+            .padding(.horizontal, 20)
             .padding(.top, 15)
 
             Spacer()
