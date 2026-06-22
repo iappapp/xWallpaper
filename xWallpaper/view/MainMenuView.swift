@@ -18,7 +18,7 @@ enum MainMenuPage: String, CaseIterable {
 
 struct MainMenuView: View {
     private let panelWidth: CGFloat = 380
-    private let panelHeight: CGFloat = 360
+    private let panelHeight: CGFloat = 370
     private let headerHeight: CGFloat = 40
 
     @State private var selectedWallpaper: Wallpaper?

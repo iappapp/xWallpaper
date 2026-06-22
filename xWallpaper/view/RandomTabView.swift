@@ -51,10 +51,12 @@ struct RandomTabView: View {
 
             ZStack {
                 RoundedRectangle(cornerRadius: 5, style: .continuous)
-                    .fill(Color.gray.opacity(0.2))
-
-                RoundedRectangle(cornerRadius: 5, style: .continuous)
-                    .stroke(Color.gray.opacity(0.45), lineWidth: 1)
+                        .fill(Color.gray.opacity(0.2))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 5, style: .continuous)
+                                .stroke(Color.gray.opacity(0.45), lineWidth: 1)
+                        )
+                        .padding(.horizontal, 10)
 
                 VStack(spacing: 8) {
                     HStack(spacing: 20) {
@@ -66,16 +68,16 @@ struct RandomTabView: View {
                             Text("Set as Wallpaper")
                                 .font(.system(size: 40 / 2, weight: .semibold))
                                 .foregroundColor(.primary.opacity(canSetWallpaper ? 0.78 : 0.45))
-                                .frame(maxWidth: .infinity, minHeight: 30)
+                                .frame(maxWidth: 220, minHeight: 30)
                         }
                         .buttonStyle(.plain)
-                        .padding(.horizontal, 20)
+                        // .padding(.horizontal, 20)
                         .disabled(!canSetWallpaper || wallpaper == nil)
                         
                     }
                 }
             }
-            .frame(maxWidth: .infinity, minHeight:20)
+            .frame(minHeight:20, maxHeight: 50)
             .padding(.horizontal, 20)
             .padding(.top, 15)
 
@@ -109,7 +111,7 @@ struct RandomTabView: View {
                     }
                     .padding(.horizontal, 10)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        
     }
 }
 
