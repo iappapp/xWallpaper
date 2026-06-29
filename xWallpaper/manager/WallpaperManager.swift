@@ -43,6 +43,34 @@ class WallpaperManager {
         }
     }
 
+    func wallpaperStorageDirectoryURLs() -> [URL] {
+        var directories = [defaultWallpaperDirectoryURL()]
+        if let authorized = resolveAuthorizedWallpaperDirectory(),
+           authorized.path != directories[0].path {
+            directories.append(authorized)
+        }
+        return directories
+    }
+
+    func removeStoredWallpaperFile(for wallpaper: Wallpaper) {
+        let fileManager = FileManager.default
+        let sanitizedID = wallpaper.id.replacingOccurrences(of: "/", with: "_")
+        let fileName = (sanitizedID.isEmpty ? UUID().uuidString : sanitizedID) + ".jpg"
+
+        for directory in wallpaperStorageDirectoryURLs() {
+            let fileURL = directory.appendingPathComponent(fileName)
+            let accessStarted = directory.startAccessingSecurityScopedResource()
+            defer {
+                if accessStarted {
+                    directory.stopAccessingSecurityScopedResource()
+                }
+            }
+
+            guard fileManager.fileExists(atPath: fileURL.path) else { continue }
+            try? fileManager.removeItem(at: fileURL)
+        }
+    }
+
     private func resolveAuthorizedWallpaperDirectory() -> URL? {
         guard let bookmarkData = UserDefaults.standard.data(forKey: wallpaperDirectoryBookmarkKey) else {
             return nil

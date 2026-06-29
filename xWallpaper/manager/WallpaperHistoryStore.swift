@@ -27,6 +27,30 @@ final class WallpaperHistoryStore {
     }
 
     @discardableResult
+    func remove(_ wallpaper: Wallpaper) -> [Wallpaper] {
+        remove(id: wallpaper.id)
+    }
+
+    @discardableResult
+    func remove(id: String) -> [Wallpaper] {
+        var history = load()
+        history.removeAll { $0.id == id }
+        save(history)
+        return history
+    }
+
+    @discardableResult
+    func remove(matchingStoredFileName fileName: String) -> [Wallpaper] {
+        var history = load()
+        history.removeAll { wallpaper in
+            let sanitizedID = wallpaper.id.replacingOccurrences(of: "/", with: "_")
+            return sanitizedID == fileName || wallpaper.id == fileName
+        }
+        save(history)
+        return history
+    }
+
+    @discardableResult
     func add(_ wallpaper: Wallpaper) -> [Wallpaper] {
         var history = load()
         history.removeAll { $0.id == wallpaper.id }

@@ -11,6 +11,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover.contentViewController = NSHostingController(rootView: MainMenuView())
 
         WallpaperRefreshScheduler.shared.start()
+        WallpaperFileCleaner.shared.start()
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         if let button = statusItem?.button {
@@ -22,6 +23,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ notification: Notification) {
         WallpaperRefreshScheduler.shared.stop()
+        WallpaperFileCleaner.shared.stop()
     }
 
     @objc func togglePopover() {

@@ -4,6 +4,7 @@ struct WallpaperGridView: View {
     let wallpapers: [Wallpaper]
     @Binding var selectedWallpaper: Wallpaper?
     var onSelect: ((Wallpaper) -> Void)? = nil
+    var onDelete: ((Wallpaper) -> Void)? = nil
     var fillsAvailableHeight: Bool = false
     var showsPlaceholdersWhenEmpty: Bool = false
     private let placeholderCount = 12
@@ -57,6 +58,13 @@ struct WallpaperGridView: View {
         .onTapGesture {
             selectedWallpaper = wallpaper
             onSelect?(wallpaper)
+        }
+        .contextMenu {
+            if let onDelete {
+                Button("Delete", role: .destructive) {
+                    onDelete(wallpaper)
+                }
+            }
         }
     }
 

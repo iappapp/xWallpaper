@@ -95,7 +95,8 @@ struct HistoryPreviewHost: View {
         HistoryTabView(
             wallpapers: PreviewData.wallpapers,
             selectedWallpaper: $selectedWallpaper,
-            onSelectWallpaper: { _ in }
+            onSelectWallpaper: { _ in },
+            onDeleteWallpaper: { _ in }
         )
     }
 }

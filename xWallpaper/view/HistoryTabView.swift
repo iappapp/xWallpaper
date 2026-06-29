@@ -4,12 +4,14 @@ struct HistoryTabView: View {
     let wallpapers: [Wallpaper]
     @Binding var selectedWallpaper: Wallpaper?
     let onSelectWallpaper: (Wallpaper) -> Void
+    let onDeleteWallpaper: (Wallpaper) -> Void
 
     var body: some View {
         WallpaperGridView(
             wallpapers: wallpapers,
             selectedWallpaper: $selectedWallpaper,
             onSelect: onSelectWallpaper,
+            onDelete: onDeleteWallpaper,
             fillsAvailableHeight: true,
             showsPlaceholdersWhenEmpty: true
         )

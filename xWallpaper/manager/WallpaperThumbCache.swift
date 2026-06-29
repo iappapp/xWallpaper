@@ -61,6 +61,21 @@ class WallpaperThumbCache {
         cachedThumbnailURL(for: wallpaper)?.absoluteString
     }
 
+    func removeThumbnail(for wallpaper: Wallpaper) {
+        var urlsToRemove = [thumbnailFileURL(for: wallpaper)]
+
+        if let localThumbUrl = wallpaper.localThumbUrl,
+           let localURL = URL(string: localThumbUrl),
+           localURL.isFileURL {
+            urlsToRemove.append(localURL)
+        }
+
+        for url in Set(urlsToRemove.map(\.standardizedFileURL)) {
+            guard fileManager.fileExists(atPath: url.path) else { continue }
+            try? fileManager.removeItem(at: url)
+        }
+    }
+
     func loadThumbnail(for wallpaper: Wallpaper, completion: @escaping (URL?) -> Void) {
         if let existingURL = cachedThumbnailURL(for: wallpaper) {
             completion(existingURL)

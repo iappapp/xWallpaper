@@ -81,7 +81,8 @@ struct MainMenuView: View {
                     HistoryTabView(
                         wallpapers: historyWallpapers,
                         selectedWallpaper: $selectedWallpaper,
-                        onSelectWallpaper: handleHistoryWallpaperTap
+                        onSelectWallpaper: handleHistoryWallpaperTap,
+                        onDeleteWallpaper: removeHistory
                     )
                 case .random:
                     RandomTabView(
@@ -211,6 +212,20 @@ struct MainMenuView: View {
 
     private func addHistory(_ wallpaper: Wallpaper) {
         historyWallpapers = WallpaperHistoryStore.shared.add(wallpaper)
+    }
+
+    private func removeHistory(_ wallpaper: Wallpaper) {
+        historyWallpapers = WallpaperHistoryStore.shared.remove(wallpaper)
+        WallpaperThumbCache.shared.removeThumbnail(for: wallpaper)
+        WallpaperManager.shared.removeStoredWallpaperFile(for: wallpaper)
+
+        if selectedWallpaper?.id == wallpaper.id {
+            selectedWallpaper = historyWallpapers.first
+        }
+
+        if randomWallpaperCached?.id == wallpaper.id {
+            randomWallpaperCached = nil
+        }
     }
 
     private func loadHistory() {
