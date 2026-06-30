@@ -17,6 +17,10 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 14) {
                 Toggle("Launch on system startup", isOn: $launchOnStartup)
                     .toggleStyle(.checkbox)
+                    .onChange(of: launchOnStartup) { newValue in
+                        guard !LaunchAtLoginManager.shared.setEnabled(newValue) else { return }
+                        launchOnStartup = LaunchAtLoginManager.shared.isEnabled
+                    }
 
                 Toggle("Update all screens and desktops", isOn: $updateAllScreens)
                     .toggleStyle(.checkbox)
