@@ -25,8 +25,10 @@ struct MainMenuView: View {
     @State private var wallpapers: [Wallpaper] = []
     @State private var historyWallpapers: [Wallpaper] = []
     @State private var categories: [Category] = []
-    @AppStorage("mainMenu.currentPage") private var currentPageRawValue: String = MainMenuPage.settings.rawValue
-    @AppStorage("selectedCategoryIds") private var selectedCategoryIdsString: String = "nature"
+    @AppStorage("mainMenu.currentPage")
+    private var currentPageRawValue: String = MainMenuPage.settings.rawValue
+    @AppStorage("selectedCategoryIds") 
+    private var selectedCategoryIdsString: String = "nature"
     @State private var isShuffling = false
     @State private var isApplyingWallpaper = false
     @State private var isDownloadingWallpaper = false

@@ -23,7 +23,6 @@ class CategoryManager {
         Category(id: "ocean", name: "Ocean", query: "ocean"),
         Category(id: "forest", name: "Forest", query: "forest"),
         Category(id: "city", name: "City", query: "city skyline"),
-        Category(id: "river", name: "River", query: "sad river"),
         Category(id: "sunset", name: "Sunset", query: "sunset landscape")
     ]
 

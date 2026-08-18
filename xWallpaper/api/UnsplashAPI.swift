@@ -14,12 +14,12 @@ class UnsplashAPI {
         config.urlCache = nil
         config.httpCookieStorage = nil
         config.httpShouldSetCookies = false
-        config.timeoutIntervalForRequest = 10
-        config.timeoutIntervalForResource = 10
+        config.timeoutIntervalForRequest = 15
+        config.timeoutIntervalForResource = 15
         return URLSession(configuration: config)
     }()
 
-    // Random wallpaper batch cache: fetch count=10 once, serve one at a time,
+    // Random wallpaper batch cache: fetch count=3 once, serve one at a time,
     // refill only when the batch is exhausted. Reduces API calls / rate limiting.
     private let batchLock = NSLock()
     private var randomBatch: [Wallpaper] = []
@@ -110,7 +110,7 @@ class UnsplashAPI {
         var components = URLComponents(string: "https://api.unsplash.com/photos/random")
         var queryItems: [URLQueryItem] = [
             URLQueryItem(name: "orientation", value: "landscape"),
-            URLQueryItem(name: "count", value: "10"),
+            URLQueryItem(name: "count", value: "3"),
             URLQueryItem(name: "client_id", value: accessKey)
         ]
 
