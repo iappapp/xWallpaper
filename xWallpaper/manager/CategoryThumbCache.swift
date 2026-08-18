@@ -131,6 +131,11 @@ class CategoryThumbCache {
         }
     }
 
+    func removeThumbnail(forCategoryId id: String) {
+        let url = cacheDirectoryURL.appendingPathComponent("\(id).png")
+        try? fileManager.removeItem(at: url)
+    }
+
     private func thumbnailFileURL(for category: Category) -> URL {
         return cacheDirectoryURL.appendingPathComponent("\(category.id).png")
     }

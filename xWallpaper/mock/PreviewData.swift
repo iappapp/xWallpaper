@@ -115,7 +115,9 @@ struct CategoryPreviewHost: View {
     var body: some View {
         CategoryView(
             categories: PreviewData.categories,
-            onSelectChange: { _ in }
+            onSelectChange: { _ in },
+            onAddCategory: { _, _ in },
+            onDeleteCategory: { _ in }
         )
     }
 }

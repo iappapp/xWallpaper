@@ -19,6 +19,14 @@ class UnsplashAPI {
         return URLSession(configuration: config)
     }()
 
+    // Random wallpaper batch cache: fetch count=10 once, serve one at a time,
+    // refill only when the batch is exhausted. Reduces API calls / rate limiting.
+    private let batchLock = NSLock()
+    private var randomBatch: [Wallpaper] = []
+    private var batchCategoryKey: String = ""
+    private var batchInFlight = false
+    private var pendingBatchCompletions: [(Wallpaper?) -> Void] = []
+
     func fetchWallpapers(category: Category, completion: @escaping ([Wallpaper]) -> Void) {
         guard !accessKey.isEmpty else {
             completion([])
@@ -52,12 +60,57 @@ class UnsplashAPI {
             return
         }
 
+        let categoryKey = Self.categoryKey(for: selectedCategories)
+
+        batchLock.lock()
+        // Invalidate cached batch when the selected categories change.
+        if batchCategoryKey != categoryKey {
+            randomBatch.removeAll()
+            batchCategoryKey = categoryKey
+        }
+
+        if let cached = randomBatch.popLast() {
+            batchLock.unlock()
+            completion(cached)
+            return
+        }
+
+        // Batch exhausted — queue this request and fetch a fresh batch (once).
+        pendingBatchCompletions.append(completion)
+        let shouldFetch = !batchInFlight
+        batchInFlight = true
+        batchLock.unlock()
+
+        guard shouldFetch else { return }
+
+        fetchRandomBatch(selectedCategories: selectedCategories) { [weak self] batch in
+            guard let self else { return }
+
+            self.batchLock.lock()
+            self.randomBatch = batch ?? []
+            self.batchInFlight = false
+            let completions = self.pendingBatchCompletions
+            self.pendingBatchCompletions.removeAll()
+            self.batchLock.unlock()
+
+            // Serve every waiting caller one wallpaper from the freshly fetched batch.
+            for callback in completions {
+                self.batchLock.lock()
+                let wp = self.randomBatch.popLast()
+                self.batchLock.unlock()
+                callback(wp)
+            }
+        }
+    }
+
+    private func fetchRandomBatch(selectedCategories: [Category], completion: @escaping ([Wallpaper]?) -> Void) {
         let pickedCategory = selectedCategories.randomElement()
         let pickedQuery = pickedCategory?.query.trimmingCharacters(in: .whitespacesAndNewlines)
 
         var components = URLComponents(string: "https://api.unsplash.com/photos/random")
         var queryItems: [URLQueryItem] = [
             URLQueryItem(name: "orientation", value: "landscape"),
+            URLQueryItem(name: "count", value: "10"),
             URLQueryItem(name: "client_id", value: accessKey)
         ]
 
@@ -73,14 +126,19 @@ class UnsplashAPI {
         }
 
         urlSession.dataTask(with: url) { data, _, _ in
-            guard let data = data else {
+            guard let data else {
                 completion(nil)
                 return
             }
 
-            let photo = try? JSONDecoder().decode(UnsplashPhoto.self, from: data)
-            completion(photo.map(Self.mapRandomPhoto))
+            // With count>1 the response is a JSON array of photos.
+            let photos = try? JSONDecoder().decode([UnsplashPhoto].self, from: data)
+            completion(photos?.map(Self.mapRandomPhoto))
         }.resume()
+    }
+
+    private static func categoryKey(for categories: [Category]) -> String {
+        categories.map { $0.id }.sorted().joined(separator: ",")
     }
 
     func fetchCategoryThumbnail(for category: Category, completion: @escaping (String?) -> Void) {

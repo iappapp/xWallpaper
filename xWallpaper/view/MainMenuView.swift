@@ -75,6 +75,10 @@ struct MainMenuView: View {
                         categories: categories,
                         onSelectChange: { _ in
                             refreshWallpapers(selectFirst: true)
+                        },
+                        onCategoriesChange: {
+                            categories = CategoryManager.shared.loadCategories()
+                            CategoryManager.shared.preloadCategoryThumbnails(categories)
                         }
                     )
                 case .history:

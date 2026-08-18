@@ -23,7 +23,7 @@ class CategoryManager {
         Category(id: "ocean", name: "Ocean", query: "ocean"),
         Category(id: "forest", name: "Forest", query: "forest"),
         Category(id: "city", name: "City", query: "city skyline"),
-        Category(id: "animals", name: "Animals", query: "wildlife"),
+        Category(id: "river", name: "River", query: "sad river"),
         Category(id: "sunset", name: "Sunset", query: "sunset landscape")
     ]
 
@@ -72,5 +72,33 @@ class CategoryManager {
                 }
             }
         }
+    }
+
+    @discardableResult
+    func addCategory(name: String, query: String) -> Category {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        let category = Category(
+            id: "custom_\(UUID().uuidString)",
+            name: trimmedName,
+            query: trimmedQuery
+        )
+        var current = loadCategories()
+        current.append(category)
+        saveCategories(current)
+        return category
+    }
+
+    func removeCategory(id: String) {
+        var current = loadCategories()
+        current.removeAll { $0.id == id }
+        saveCategories(current)
+
+        CategoryThumbCache.shared.removeThumbnail(forCategoryId: id)
+
+        let raw = UserDefaults.standard.string(forKey: "selectedCategoryIds") ?? ""
+        var ids = Set(raw.split(separator: ",").map(String.init))
+        ids.remove(id)
+        UserDefaults.standard.set(ids.sorted().joined(separator: ","), forKey: "selectedCategoryIds")
     }
 }
