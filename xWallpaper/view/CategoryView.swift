@@ -13,11 +13,11 @@ struct CategoryView: View {
     @State private var pendingDeleteId: String?
 
     private var columns: [GridItem] {
-        Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
+        Array(repeating: GridItem(.flexible(), spacing: 8), count: 3)
     }
 
     private var gridSpacing: CGFloat {
-        10
+        8
     }
 
     private var horizontalPadding: CGFloat {
@@ -100,7 +100,6 @@ struct CategoryView: View {
                 .foregroundColor(.secondary)
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 80, maxHeight: 80)
-        .padding(.horizontal, 4)
         .contentShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
         .onTapGesture {
             showingAddDialog = true
@@ -168,7 +167,6 @@ struct CategoryView: View {
             RoundedRectangle(cornerRadius: 5, style: .continuous)
                 .stroke(isSelected ? Color.white.opacity(0.95) : Color.clear, lineWidth: 1.2)
         )
-        .padding(.horizontal, 4)
         .contentShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
         .onTapGesture {
             var newIds = selectedCategoryIds
@@ -202,7 +200,7 @@ private struct CategoryThumbnailImageView: View {
                 Color.gray.opacity(0.3)
             }
         }
-        .frame(minWidth: 110, maxWidth: 120, minHeight: 80, maxHeight: 80)
+        .frame(maxWidth: .infinity, minHeight: 80, maxHeight: 80)
         .task(id: category.id) {
             isLoading = true
             if let cached = CategoryThumbCache.shared.cachedThumbnailURL(for: category) {

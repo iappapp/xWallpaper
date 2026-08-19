@@ -18,7 +18,7 @@ struct WallpaperGridView: View {
     }
 
     private var tileHeight: CGFloat {
-        70
+        80
     }
 
     private var horizontalPadding: CGFloat {
@@ -49,8 +49,12 @@ struct WallpaperGridView: View {
         let isSelected = selectedWallpaper?.id == wallpaper.id
         let shape = RoundedRectangle(cornerRadius: 5, style: .continuous)
 
-        WallpaperThumbnailImageView(wallpaper: wallpaper, shape: shape)
-            .frame(width: 110, height: tileHeight)
+        ZStack {
+            Color.gray.opacity(0.22)
+
+            WallpaperThumbnailImageView(wallpaper: wallpaper)
+        }
+        .frame(maxWidth: .infinity, minHeight: tileHeight, maxHeight: tileHeight)
         .clipShape(shape)
         .overlay(shape.stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 1.5))
         .shadow(color: isSelected ? Color.black.opacity(0.12) : Color.clear, radius: 3, x: 0, y: 1)
@@ -71,46 +75,47 @@ struct WallpaperGridView: View {
     private var placeholderTile: some View {
         let shape = RoundedRectangle(cornerRadius: 5, style: .continuous)
 
-        return shape
-            .fill(Color.gray.opacity(0.14))
-            .overlay(
-                Image(systemName: "photo")
-                    .font(.system(size: 14, weight: .regular))
-                    .foregroundColor(.secondary.opacity(0.65))
-            )
-            .frame(height: tileHeight)
+        return ZStack {
+            Color.gray.opacity(0.14)
+            Image(systemName: "photo")
+                .font(.system(size: 14, weight: .regular))
+                .foregroundColor(.secondary.opacity(0.65))
+        }
+        .frame(maxWidth: .infinity, minHeight: tileHeight, maxHeight: tileHeight)
+        .clipShape(shape)
     }
 }
 
 private struct WallpaperThumbnailImageView: View {
     let wallpaper: Wallpaper
-    let shape: RoundedRectangle
 
     @State private var localImage: NSImage?
 
     var body: some View {
-        Group {
-            if let localImage {
-                Image(nsImage: localImage)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-            } else {
-                shape.fill(Color.gray.opacity(0.18))
-            }
-        }
-        .task(id: wallpaper.id) {
-            if let cached = WallpaperThumbCache.shared.cachedThumbnailURL(for: wallpaper) {
-                localImage = NSImage(contentsOf: cached)
-                return
-            }
+        Color.gray.opacity(0.18)
+            .overlay(
+                Group {
+                    if let localImage {
+                        Image(nsImage: localImage)
+                            .resizable()
+                            .scaledToFill()
+                    }
+                }
+            )
+            .clipped()
+            .task(id: wallpaper.id) {
+                if let cached = WallpaperThumbCache.shared.cachedThumbnailURL(for: wallpaper) {
+                    localImage = NSImage(contentsOf: cached)
+                    return
+                }
 
-            WallpaperThumbCache.shared.loadThumbnail(for: wallpaper) { url in
-                guard let url else { return }
-                DispatchQueue.main.async {
-                    localImage = NSImage(contentsOf: url)
+                WallpaperThumbCache.shared.loadThumbnail(for: wallpaper) { url in
+                    guard let url else { return }
+                    DispatchQueue.main.async {
+                        localImage = NSImage(contentsOf: url)
+                    }
                 }
             }
-        }
     }
 }
 
